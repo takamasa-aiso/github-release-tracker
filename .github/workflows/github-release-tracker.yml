@@ -1,4 +1,4 @@
-name: Watch Upstream Release
+name: GitHub Release Tracker
 on:
   schedule:
     - cron: '*/30 * * * *'
