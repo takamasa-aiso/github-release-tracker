@@ -56,7 +56,7 @@ GitHub Actions (スケジュール: 30分ごと)
 
 ### 1. リポジトリをfork
 https://github.com/takamasa-aiso/github-release-tracker にアクセスして、自身のGithubにforkします。
-(Github上にコピーできればfork以外の方法でもOKです)
+(GitHub上にコピーできればfork以外の方法でもOKです)
 
 ### 2. リポジトリをクローン (WSL2)
 
