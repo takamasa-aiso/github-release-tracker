@@ -127,7 +127,7 @@ Value: https://discord.com/api/webhooks/xxxx/yyyy (コピーしたURL)
 git init
 vi .github/workflows/github-release-tracker.yml
 git add .github/workflows/github-release-tracker.yml
-git commit -m "Add watch-upstream workflow"
+git commit -m "Add GitHub Release Tracker"
 git remote add origin https://github.com/takamasa-aiso/github-release-tracker.git
 git push origin main
 ```
@@ -139,7 +139,7 @@ git push origin main
 手動実行でテストできます。
 
 ```
-Actions タブ → Watch Upstream Release → Run workflow
+Actions タブ → GitHub Release Tracker → Run workflow
 ```
 
 リポジトリの「Actions」タブにワークフローが表示されれば完了。
