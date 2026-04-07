@@ -11,6 +11,7 @@ GitHub Actions を使った自動化ワークフロー。
 GitHub サーバ
   └─ リポジトリの .github/workflows/github-release-tracker.yml を読む
        └─ 時間(cron)になったら ローカル(WSL2)の self-hosted runner にジョブを送る
+
 WSL2上の self-hosted runner サービス（常駐）
   └─ GitHubのジョブキューをポーリングしてジョブを受信
        └─ [Step 1] Check latest release
