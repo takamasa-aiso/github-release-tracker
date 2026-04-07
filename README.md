@@ -1,16 +1,16 @@
 # github-release-tracker
 
 GitHub Actions を使った自動化ワークフロー。  
-外部リポジトリのリリースを監視し、ローカル(WSL2)へ自動反映 + Discord通知を行う。
+外部リポジトリのリリースを監視し、ローカル(WSL2)へ自動反映 + Discord通知を行います。
 
 ---
 
 ## ワークフロー一覧
 
+```
 GitHub サーバ
   └─ リポジトリの .github/workflows/github-release-tracker.yml を読む
        └─ 時間(cron)になったら ローカル(WSL2)の self-hosted runner にジョブを送る
-
 WSL2上の self-hosted runner サービス（常駐）
   └─ GitHubのジョブキューをポーリングしてジョブを受信
        └─ [Step 1] Check latest release
@@ -25,6 +25,7 @@ WSL2上の self-hosted runner サービス（常駐）
                                └─ [Step 2] Notify update（条件: updated==true）
                                     └─ Discord Webhook に curl でPOST
                                          └─ Discordに通知が届く
+```
 
 ---
 
@@ -52,24 +53,28 @@ GitHub Actions (スケジュール: 30分ごと)
 
 ## セットアップ手順
 
-### 1. リポジトリをクローン (WSL2)
+### 1. リポジトリをfork
+https://github.com/takamasa-aiso/github-release-tracker にアクセスして、自身のGithubにforkします。
+(Github上にコピーできればfork以外の方法でもOKです)
+
+### 2. リポジトリをクローン (WSL2)
 
 ```bash
 git clone https://github.com/takamasa-aiso/github-release-tracker.git
 cd github-release-tracker
 ```
 
-### 2. 必要パッケージの確認 (WSL2)
+### 3. 必要パッケージの確認 (WSL2)
 
 ```bash
 # 確認
-curl --version && jq --version && git --version && tar --version && gh --version
+curl --version && jq --version && git --version && tar --version
 
 # 未インストールの場合
-sudo apt update && sudo apt install -y curl jq git tar gh
+sudo apt update && sudo apt install -y curl jq git tar
 ```
 
-### 3. GitHub Actions self-hosted runner のインストール (WSL2)
+### 4. GitHub Actions self-hosted runner のインストール (WSL2)
 
 GitHubのリポジトリページで Runner を登録・インストールします。
 
@@ -85,7 +90,7 @@ GitHubのリポジトリページで Runner を登録・インストールしま
 mkdir ~/actions-runner && cd ~/actions-runner
 curl -o actions-runner-linux-x64-*.tar.gz -L https://github.com/actions/runner/releases/download/...
 tar xzf ./actions-runner-linux-x64-*.tar.gz
-./config.sh --url https://github.com/あなたのID/リポジトリ名 --token XXXXX
+./config.sh --url https://github.com/自分のID/リポジトリ名 --token XXXXX
 ```
 
 インストール後、サービスとして常駐させます。
@@ -99,13 +104,13 @@ sudo ./svc.sh start
 sudo ./svc.sh status
 ```
 
-### 4. Discord Webhook URL の取得
+### 5. Discord Webhook URL の取得
 
 1. Discord で通知を受け取りたいチャンネルを右クリック →「チャンネルの編集」
 2. 「連携サービス」→「ウェブフック」→「新しいウェブフック」
 3. 名前をつけて「ウェブフックURLをコピー」
 
-### 5. GitHub Secrets への登録
+### 6. GitHub Secrets への登録
 
 ```
 このリポジトリ → Settings → Secrets and variables → Actions
@@ -115,13 +120,15 @@ Name:  DISCORD_WEBHOOK_URL
 Value: https://discord.com/api/webhooks/xxxx/yyyy (コピーしたURL)
 ```
 
-### 6. ワークフローをプッシュ (WSL2)
+### 7. ワークフローをプッシュ (WSL2)
 
 ```bash
+git init
 vi .github/workflows/github-release-tracker.yml
 git add .github/workflows/github-release-tracker.yml
 git commit -m "Add watch-upstream workflow"
-git push
+git remote add origin https://github.com/takamasa-aiso/github-release-tracker.git
+git push origin main
 ```
 
 プッシュ後、リポジトリの「Actions」タブにワークフローが表示されれば完了。
