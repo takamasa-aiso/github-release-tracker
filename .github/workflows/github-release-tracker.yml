@@ -1,0 +1,47 @@
+name: Watch Upstream Release
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+env:
+  TRACKER_DIR: $GITHUB_WORKSPACE
+  # ~/actions-runner/_work/github-release-tracker/github-release-tracker/
+
+jobs:
+  check-and-pull:
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        include:
+          - repo: OWNER/REPO
+            local_path: /path/to/repo
+          # リポジトリを追加する場合は上記2行のセットをここに記載
+    steps:
+      - name: Check latest release (${{ matrix.repo }})
+        id: check
+        run: |
+          REPO_NAME="${{ matrix.repo }}"
+          REPO_NAME="${REPO_NAME##*/}"  # OWNER/REPO → REPO を抽出
+          VERSION_FILE="${{ env.TRACKER_DIR }}/.upstream-version-${REPO_NAME}"
+
+          LATEST=$(curl -s https://api.github.com/repos/${{ matrix.repo }}/releases/latest | jq -r .tag_name)
+          CURRENT=$(cat ${VERSION_FILE} 2>/dev/null || echo "none")
+
+          if [ "$LATEST" != "$CURRENT" ]; then
+            cd ${{ matrix.local_path }}
+            git fetch upstream
+            git checkout $LATEST
+            echo $LATEST > ${VERSION_FILE}
+            echo "updated=true" >> $GITHUB_OUTPUT
+            echo "latest=$LATEST" >> $GITHUB_OUTPUT
+          else
+            echo "updated=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Notify update (${{ matrix.repo }})
+        if: steps.check.outputs.updated == 'true'
+        run: |
+          curl -X POST "${{ secrets.DISCORD_WEBHOOK_URL }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"content\": \"[${{ matrix.repo }}] Updated to ${{ steps.check.outputs.latest }}\"}"
