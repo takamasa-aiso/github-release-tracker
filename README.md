@@ -133,6 +133,13 @@ git push origin main
 
 プッシュ後、リポジトリの「Actions」タブにワークフローが表示されれば完了。
 
+ワークフローに表示されない場合は、yml構文が正しいこと、もしくは設定を確認してみてください。
+
+```
+リポジトリ → Settings → Actions → General
+→ Actions permissions が「Allow all actions」になっているか
+```
+
 ---
 
 ## 動作確認
