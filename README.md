@@ -2,6 +2,7 @@
 
 GitHub Actions を使った自動化ワークフロー。  
 外部リポジトリのリリースを監視し、ローカル(WSL2)へ自動反映 + Discord通知を行います。
+Linuxベースのシステムでしたら流用できます。
 
 ---
 
@@ -55,7 +56,7 @@ GitHub Actions (スケジュール: 30分ごと)
 ## セットアップ手順
 
 ### 1. リポジトリをfork
-https://github.com/takamasa-aiso/github-release-tracker にアクセスして、自身のGithubにforkします。
+https://github.com/takamasa-aiso/github-release-tracker にアクセスして、ご自身のGithubにforkします。
 (GitHub上にコピーできればfork以外の方法でもOKです)
 
 ### 2. リポジトリをクローン (WSL2)
