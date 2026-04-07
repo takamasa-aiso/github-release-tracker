@@ -4,27 +4,35 @@ on:
     - cron: '*/30 * * * *'
   workflow_dispatch:
 
-env:
-  TRACKER_DIR: $GITHUB_WORKSPACE
-  # ~/actions-runner/_work/github-release-tracker/github-release-tracker/
-
 jobs:
   check-and-pull:
     runs-on: self-hosted
     strategy:
       matrix:
         include:
-          - repo: usedhonda/statusline
-            local_path: ~/github/github-release-tracker
-          # リポジトリを追加する場合は上記2行のセットをここに記載
+          - repo: OWNER/REPO
+            local_path: /path/to/repo
+        # リポジトリを追加する場合は上記2行のセットをここに記載
+        # - repo: takamasa-aiso/github-release-tracker
+        #   local_path: ~/github-release-tracker
     steps:
       - name: Check latest release (${{ matrix.repo }})
         id: check
         run: |
+          TRACKER_DIR="$HOME/github/github-release-tracker"
+          mkdir -p ${TRACKER_DIR}
+          
           REPO_NAME="${{ matrix.repo }}"
           REPO_NAME="${REPO_NAME##*/}"  # OWNER/REPO → REPO を抽出
           VERSION_FILE="${{ env.TRACKER_DIR }}/.upstream-version-${REPO_NAME}"
 
+          # バージョンファイルがない場合はローカルの現在タグで初期化
+          if [ ! -f "${VERSION_FILE}" ]; then
+            LOCAL_VERSION=$(git -C ${{ matrix.local_path }} describe --tags --exact-match 2>/dev/null || echo "none")
+            echo "Initializing version file with local version: ${LOCAL_VERSION}"
+            echo ${LOCAL_VERSION} > ${VERSION_FILE}
+          fi
+          
           LATEST=$(curl -s https://api.github.com/repos/${{ matrix.repo }}/releases/latest | jq -r .tag_name)
           CURRENT=$(cat ${VERSION_FILE} 2>/dev/null || echo "none")
 
@@ -38,7 +46,7 @@ jobs:
               REMOTE="origin"
             fi
             echo "Using remote: ${REMOTE}"
-            git fetch echo ${REMOTE}
+            git fetch ${REMOTE} --tags
             git checkout $LATEST
 
             echo $LATEST > ${VERSION_FILE}
