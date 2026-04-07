@@ -14,8 +14,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - repo: OWNER/REPO
-            local_path: /path/to/repo
+          - repo: usedhonda/statusline
+            local_path: ~/github/github-release-tracker
           # リポジトリを追加する場合は上記2行のセットをここに記載
     steps:
       - name: Check latest release (${{ matrix.repo }})
@@ -30,8 +30,17 @@ jobs:
 
           if [ "$LATEST" != "$CURRENT" ]; then
             cd ${{ matrix.local_path }}
-            git fetch upstream
+
+            # upstream があればそちらを優先、なければ origin を使用
+            if git remote | grep -q "^upstream$"; then
+              REMOTE="upstream"
+            else
+              REMOTE="origin"
+            fi
+            echo "Using remote: ${REMOTE}"
+            git fetch echo ${REMOTE}
             git checkout $LATEST
+
             echo $LATEST > ${VERSION_FILE}
             echo "updated=true" >> $GITHUB_OUTPUT
             echo "latest=$LATEST" >> $GITHUB_OUTPUT
